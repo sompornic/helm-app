@@ -1,0 +1,60 @@
+name: Deploy to K8s with Helm
+
+on:
+  workflow_dispatch:  # Manual Trigger
+    inputs:
+      imageTag:
+        description: "Docker Image Tag"
+        required: true
+        default: "latest"
+
+  repository_dispatch:  # Trigger ผ่าน API
+    types: [deploy-k8s]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 🔹 ติดตั้ง `yq` สำหรับอ่านค่า YAML
+      - name: Install yq
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq
+          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          chmod +x /usr/bin/yq
+
+      # 🔹 Login to Kubernetes Cluster
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: v1.26.0
+
+      - name: Authenticate with K8s
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | base64 --decode > kubeconfig
+          export KUBECONFIG=$(pwd)/kubeconfig
+
+      # 🔹 อ่านค่า `image.repository` และ `image.tag` จาก `app1/values.yml`
+      - name: Read image from app1/values.yml
+        id: read_values
+        run: |
+          IMAGE_REPO=$(yq e '.image.repository' ./app1/values.yml)
+          IMAGE_TAG=$(yq e '.image.tag' ./app1/values.yml)
+          echo "IMAGE_REPO=$IMAGE_REPO"
+          echo "IMAGE_TAG=$IMAGE_TAG"
+          echo "IMAGE_REPO=$IMAGE_REPO" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      # 🔹 Deploy ด้วย Helm
+      - name: Deploy with Helm
+        run: |
+          IMAGE_TAG=${{ github.event.inputs.imageTag || github.event.client_payload.imageTag || env.IMAGE_TAG }}
+          IMAGE_REPO=${{ env.IMAGE_REPO }}
+
+          helm upgrade --install my-app ./app1 \
+            --namespace default \
+            --set image.repository=$IMAGE_REPO \
+            --set image.tag=$IMAGE_TAG

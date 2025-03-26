@@ -30,17 +30,13 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" | base64 --decode > kubeconfig
           export KUBECONFIG=$(pwd)/kubeconfig
 
-      - name: List directory contents
-        run: |
-          ls -R
-
       # 🔹 อ่านค่า `image.repository` และ `image.tag` จาก `app1/values.yml`
       - name: Read image from app1/values.yml
         id: read_values
         run: |
           ls -lrt
-          IMAGE_REPO=$(yq e '.image.repository' ./app1/values.yml)
-          IMAGE_TAG=$(yq e '.image.tag' ./app1/values.yml)
+          IMAGE_REPO=$(yq e '.image.repository' ./app1/values.yaml)
+          IMAGE_TAG=$(yq e '.image.tag' ./app1/values.yaml)
           echo "IMAGE_REPO=$IMAGE_REPO"
           echo "IMAGE_TAG=$IMAGE_TAG"
           echo "IMAGE_REPO=$IMAGE_REPO" >> $GITHUB_ENV

@@ -19,13 +19,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 🔹 ติดตั้ง `yq` สำหรับอ่านค่า YAML
-      - name: Install yq
-        run: |
-          sudo apt-get update && sudo apt-get install -y jq
-          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
-          chmod +x /usr/bin/yq
-
       # 🔹 Login to Kubernetes Cluster
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3

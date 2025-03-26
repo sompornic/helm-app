@@ -30,6 +30,10 @@ jobs:
           echo "${{ secrets.KUBECONFIG }}" | base64 --decode > kubeconfig
           export KUBECONFIG=$(pwd)/kubeconfig
 
+      - name: List directory contents
+        run: |
+          ls -R
+
       # 🔹 อ่านค่า `image.repository` และ `image.tag` จาก `app1/values.yml`
       - name: Read image from app1/values.yml
         id: read_values

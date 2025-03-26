@@ -29,6 +29,9 @@ jobs:
         run: |
           mkdir -p $HOME/.kube
 
+      - name: Print KUBE_TOKEN
+        run: echo "${{ secrets.KUBE_TOKEN }}"
+
       - name: Set up KUBECONFIG
         run: |
           echo "${{ secrets.KUBE_TOKEN }}" | base64 --decode > $HOME/.kube/config

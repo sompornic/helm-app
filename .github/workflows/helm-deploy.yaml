@@ -33,11 +33,7 @@ jobs:
         run: |
           echo "${{ secrets.KUBE_TOKEN }}" | base64 --decode > $HOME/.kube/config
           export KUBECONFIG=$HOME/.kube/config
-
-      # Debug KUBECONFIG content
-      - name: Debug KUBECONFIG content
-        run: |
-          cat $HOME/.kube/config
+          ls -l $HOME/.kube/config
 
       # 🔹 ตรวจสอบการเชื่อมต่อกับ Kubernetes
       - name: Check kubectl connection

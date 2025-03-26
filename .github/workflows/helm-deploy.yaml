@@ -35,11 +35,6 @@ jobs:
           export KUBECONFIG=$HOME/.kube/config
           ls -l $HOME/.kube/config
 
-      # 🔹 ตรวจสอบการเชื่อมต่อกับ Kubernetes
-      - name: Check kubectl connection
-        run: |
-          kubectl get nodes
-
       # 🔹 อ่านค่า `image.repository` และ `image.tag` จาก `app1/values.yml`
       - name: Read image from app1/values.yml
         id: read_values

@@ -31,7 +31,7 @@ jobs:
 
       - name: Set up KUBECONFIG
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | base64 --decode > $HOME/.kube/config
+          echo "${{ secrets.KUBE_TOKEN }}" | base64 --decode > $HOME/.kube/config
           export KUBECONFIG=$HOME/.kube/config
 
       # 🔹 อ่านค่า `image.repository` และ `image.tag` จาก `app1/values.yml`

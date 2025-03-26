@@ -29,13 +29,11 @@ jobs:
         run: |
           mkdir -p $HOME/.kube
 
-      - name: Print KUBE_TOKEN
-        run: echo "${{ secrets.KUBE_TOKEN }}"
-
       - name: Set up KUBECONFIG
         run: |
           echo "${{ secrets.KUBE_TOKEN }}" | base64 --decode > $HOME/.kube/config
           export KUBECONFIG=$HOME/.kube/config
+
 
       # 🔹 อ่านค่า `image.repository` และ `image.tag` จาก `app1/values.yml`
       - name: Read image from app1/values.yml

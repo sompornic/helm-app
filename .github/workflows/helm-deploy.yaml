@@ -34,20 +34,10 @@ jobs:
       - name: Read image from app1/values.yml
         id: read_values
         run: |
+          ls -lrt
           IMAGE_REPO=$(yq e '.image.repository' ./app1/values.yml)
           IMAGE_TAG=$(yq e '.image.tag' ./app1/values.yml)
           echo "IMAGE_REPO=$IMAGE_REPO"
           echo "IMAGE_TAG=$IMAGE_TAG"
           echo "IMAGE_REPO=$IMAGE_REPO" >> $GITHUB_ENV
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-
-      # 🔹 Deploy ด้วย Helm
-      - name: Deploy with Helm
-        run: |
-          IMAGE_TAG=${{ github.event.inputs.imageTag || github.event.client_payload.imageTag || env.IMAGE_TAG }}
-          IMAGE_REPO=${{ env.IMAGE_REPO }}
-
-          helm upgrade --install my-app ./app1 \
-            --namespace default \
-            --set image.repository=$IMAGE_REPO \
-            --set image.tag=$IMAGE_TAG

@@ -48,7 +48,7 @@ jobs:
           IMAGE_TAG=${{ github.event.inputs.imageTag || github.event.client_payload.imageTag || env.IMAGE_TAG }}
           IMAGE_REPO=${{ env.IMAGE_REPO }}
 
-          helm upgrade --install my-app ./app1 \
-            --namespace  testDeploy \
+          helm upgrade --install app1 ./app1 \
+            --namespace  testdeploy --create-namespace \
             --set image.repository=$IMAGE_REPO \
             --set image.tag=$IMAGE_TAG

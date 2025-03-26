@@ -41,3 +41,14 @@ jobs:
           echo "IMAGE_TAG=$IMAGE_TAG"
           echo "IMAGE_REPO=$IMAGE_REPO" >> $GITHUB_ENV
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      # 🔹 Deploy ด้วย Helm
+      - name: Deploy with Helm
+        run: |
+          IMAGE_TAG=${{ github.event.inputs.imageTag || github.event.client_payload.imageTag || env.IMAGE_TAG }}
+          IMAGE_REPO=${{ env.IMAGE_REPO }}
+
+          helm upgrade --install my-app ./app1 \
+            --namespace  testDeploy \
+            --set image.repository=$IMAGE_REPO \
+            --set image.tag=$IMAGE_TAG

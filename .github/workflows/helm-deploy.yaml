@@ -25,10 +25,11 @@ jobs:
         with:
           version: v1.26.0
 
-      - name: Authenticate with K8s
+      - name: Set up KUBECONFIG
         run: |
-          echo "${{ secrets.KUBECONFIG }}" | base64 --decode > kubeconfig
-          export KUBECONFIG=$(pwd)/kubeconfig
+          echo "${{ secrets.KUBECONFIG }}" | base64 --decode > $HOME/.kube/config
+          export KUBECONFIG=$HOME/.kube/config
+          kubectl cluster-info
 
       # 🔹 อ่านค่า `image.repository` และ `image.tag` จาก `app1/values.yml`
       - name: Read image from app1/values.yml

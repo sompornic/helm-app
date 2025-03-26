@@ -34,6 +34,15 @@ jobs:
           echo "${{ secrets.KUBE_TOKEN }}" | base64 --decode > $HOME/.kube/config
           export KUBECONFIG=$HOME/.kube/config
 
+      # Debug KUBECONFIG content
+      - name: Debug KUBECONFIG content
+        run: |
+          cat $HOME/.kube/config
+
+      # 🔹 ตรวจสอบการเชื่อมต่อกับ Kubernetes
+      - name: Check kubectl connection
+        run: |
+          kubectl get nodes
 
       # 🔹 อ่านค่า `image.repository` และ `image.tag` จาก `app1/values.yml`
       - name: Read image from app1/values.yml

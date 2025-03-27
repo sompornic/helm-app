@@ -46,6 +46,7 @@ affinity: {}
 
 # charts/my-app/values.yaml
 config_payload: |
+  "{"test":"123","data":"da"}"
   {
     "key": "initial_value"
   }

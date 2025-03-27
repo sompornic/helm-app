@@ -1,0 +1,8 @@
+# charts/my-app/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "app1.name" . }}
+data:
+  config.json: |
+    {{ .Values.config_payload | nindent 4 }}  # ตัวแปรนี้จะรับค่าจาก values.yaml หรือการอัปเดตผ่าน GitHub Actions

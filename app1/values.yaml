@@ -43,3 +43,9 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# charts/my-app/values.yaml
+config_payload: |
+  {
+    "key": "initial_value"
+  }

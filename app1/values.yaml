@@ -45,7 +45,7 @@ tolerations: []
 affinity: {}
 
 # charts/my-app/values.yaml
-config_payload: |
+config_payload:
   {
     "key": "initial_value"
   }

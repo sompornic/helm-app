@@ -3,13 +3,13 @@ name: Deploy to K8s with Helm
 on:
   workflow_dispatch:  # Manual Trigger
     inputs:
-      imageTag:
-        description: "Docker Image Tag"
+      zone:
+        description: "Deployment Zone"
         required: true
-        default: "latest"
+        default: "sit"
 
   repository_dispatch:  # Trigger ผ่าน API
-    types: [deploy-k8s]
+    types: [deploy]
 
 jobs:
   deploy:
@@ -29,9 +29,18 @@ jobs:
         run: |
           mkdir -p $HOME/.kube
 
-      - name: Set up KUBECONFIG
+      - name: Set up KUBECONFIG based on zone
         run: |
-          echo "${{ secrets.KUBE_TOKEN }}" | base64 --decode > $HOME/.kube/config
+          ZONE=${{ github.event.inputs.zone || github.event.client_payload.zone || 'dev' }}
+          if [[ "$ZONE" == "dev" ]]; then
+            echo "${{ secrets.KUBE_CONFIG_DEV }}" | base64 --decode > $HOME/.kube/config
+          elif [[ "$ZONE" == "staging" ]]; then
+            echo "${{ secrets.KUBE_CONFIG_STAGING }}" | base64 --decode > $HOME/.kube/config
+          elif [[ "$ZONE" == "prod" ]]; then
+            echo "${{ secrets.KUBE_CONFIG_PROD }}" | base64 --decode > $HOME/.kube/config
+          else
+            echo "Unknown zone: $ZONE" && exit 1
+          fi
           export KUBECONFIG=$HOME/.kube/config
           ls -l $HOME/.kube/config
 
@@ -50,10 +59,10 @@ jobs:
       # 🔹 Deploy ด้วย Helm
       - name: Deploy with Helm
         run: |
-          IMAGE_TAG=${{ github.event.inputs.imageTag || github.event.client_payload.imageTag || env.IMAGE_TAG }}
           IMAGE_REPO=${{ env.IMAGE_REPO }}
+          IMAGE_TAG=${{ env.IMAGE_TAG }}
 
           helm upgrade --install app1 ./app1 \
-            --namespace  testdeploy --create-namespace \
+            --namespace $ZONE --create-namespace \
             --set image.repository=$IMAGE_REPO \
             --set image.tag=$IMAGE_TAG

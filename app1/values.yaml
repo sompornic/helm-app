@@ -5,7 +5,7 @@
 replicaCount: 1
 image:
   repository: sompornic/my-app
-  tag: dev1.0.104
+  tag: dev1.0.105
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP

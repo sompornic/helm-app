@@ -5,7 +5,7 @@
 replicaCount: 1
 image:
   repository: sompornic/my-app
-  tag: staging1.0.123
+  tag: staging1.0.124
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP

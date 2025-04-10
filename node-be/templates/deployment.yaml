@@ -1,55 +1,60 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "app1.fullname" . }}
+  name: {{ .Values.app.name }}
+  namespace: {{ .Values.namespace }}
   labels:
-    app: {{ template "app1.name" . }}
-    chart: {{ template "app1.chart" . }}
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
+    app: {{ .Values.app.name }}
+    tier: {{ .Values.app.tier }}
 spec:
-  replicas: {{ .Values.replicaCount }}
-  revisionHistoryLimit: 3
   selector:
     matchLabels:
-      app: {{ template "app1.name" . }}
-      release: {{ .Release.Name }}
+      app: {{ .Values.app.name }}
+      tier: {{ .Values.app.tier }}
   template:
     metadata:
       labels:
-        app: {{ template "app1.name" . }}
-        release: {{ .Release.Name }}
+        app: {{ .Values.app.name }}
+        tier: {{ .Values.app.tier }}
     spec:
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        - name: {{ .Values.app.name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          envFrom:
-            - configMapRef:
-                name: {{ template "app1.name" . }}  # ใช้ ConfigMap ที่เราเพิ่งประกาศไว้
-          volumeMounts:
-          - name: config-volume
-            mountPath: /app/my-app-config
-            subPath: config.json
+          env:
+            - name: mode
+              value: {{ .Values.env.mode }}
           ports:
-            - name: http
-              containerPort: 3000
+            - containerPort: {{ .Values.service.port }}
               protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
           resources:
-{{ toYaml .Values.resources | indent 12 }}
-    {{- with .Values.nodeSelector }}
-      nodeSelector:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.affinity }}
-      affinity:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-{{ toYaml . | indent 8 }}
-    {{- end }}
-    volumes:
-      - name: config-volume
-        configMap:
-          name: {{ template "app1.name" . }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+          volumeMounts:
+            - mountPath: {{ .Values.volume.mountPath }}
+              subPath: {{ .Values.volume.subPath }}
+              name: {{ .Values.volume.name }}
+      volumes:
+        - name: {{ .Values.volume.name }}
+          configMap:
+            name: {{ .Values.configMap.name }}

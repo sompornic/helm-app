@@ -5,4 +5,4 @@ metadata:
   namespace: {{ .Values.namespace }}
 data:
   config-iot.json: |
-    {{ .Files.Get "configmap.json" | indent 4 }}
+    {{ .Files.Get "file/configmap.json" | indent 4 }}
